@@ -1,0 +1,2 @@
+include ':app', ':live-recyclerview'
+rootProject.name='LiveRecyclerView'
