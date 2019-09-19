@@ -1,0 +1,151 @@
+package sb.liverecyclerview;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import java.util.List;
+
+public class StatableLiveRecyclerView extends LiveRecyclerView {
+
+    private final LayoutManager stateLayoutManager;
+    private boolean isStateAdapterSetting = false;
+    private Adapter adapter;
+    private LayoutManager layoutManager;
+
+    private View loadingView;
+    private View errorView;
+    private View emptyView;
+
+    public StatableLiveRecyclerView(@NonNull Context context) {
+        this(context, null);
+    }
+
+    public StatableLiveRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public StatableLiveRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        stateLayoutManager = new LinearLayoutManager(context, VERTICAL, false);
+
+        loadingView = LayoutInflater.from(context).inflate(R.layout.lrv_loading_view, this, false);
+        errorView = new View(context);
+        emptyView = new View(context);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setData(final StatableLiveList data) {
+        super.setData(data);
+
+        data.getState().observe((LifecycleOwner) getContext(), new Observer<StatableLiveList.State>() {
+            @Override
+            public void onChanged(StatableLiveList.State state) {
+                switch (state) {
+                    case LOADING:
+                        setStateAdapter(loadingView);
+                        break;
+                    case ERROR:
+                        setStateAdapter(errorView);
+                        break;
+                    case EMPTY:
+                        setStateAdapter(emptyView);
+                        break;
+                    case RESULT:
+                        setDataAdapter();
+                        break;
+                }
+            }
+        });
+    }
+
+    @Override
+    public void setAdapter(Adapter adapter) {
+        super.setAdapter(adapter);
+
+        if (!isStateAdapterSetting) {
+            this.adapter = adapter;
+        }
+    }
+
+    @Override
+    public void setLayoutManager(LayoutManager layoutManager) {
+        super.setLayoutManager(layoutManager);
+
+        if (!isStateAdapterSetting) {
+            this.layoutManager = layoutManager;
+        }
+    }
+
+    public void setLoadingView(View loadingView) {
+        this.loadingView = loadingView;
+    }
+
+    public void setErrorView(View errorView) {
+        this.errorView = errorView;
+    }
+
+    public void setEmptyView(View emptyView) {
+        this.emptyView = emptyView;
+    }
+
+    public View getLoadingView() {
+        return loadingView;
+    }
+
+    public View getErrorView() {
+        return errorView;
+    }
+
+    public View getEmptyView() {
+        return emptyView;
+    }
+
+    private void setStateAdapter(View view) {
+        isStateAdapterSetting = true;
+        setAdapter(new StateAdapter(view));
+        setLayoutManager(stateLayoutManager);
+        isStateAdapterSetting = false;
+    }
+
+    private void setDataAdapter() {
+        setAdapter(adapter);
+        setLayoutManager(layoutManager);
+    }
+
+    private static class StateAdapter extends Adapter<ViewHolder> {
+
+        private final View view;
+
+        StateAdapter(View view) {
+            this.view = view;
+        }
+
+        @Override
+        public int getItemCount() {
+            return 1;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ViewHolder(view) {
+            };
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        }
+    }
+}
