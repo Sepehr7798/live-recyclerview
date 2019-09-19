@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="StatableLiveRecyclerView">
+		<attr name="lrv_loading_view_visible" format="boolean" />
+		<attr name="lrv_loading_view_layout" format="reference" />
+		<attr name="lrv_empty_view_layout" format="reference" />
+		<attr name="lrv_error_view_layout" format="reference" />
+	</declare-styleable>
+</resources>

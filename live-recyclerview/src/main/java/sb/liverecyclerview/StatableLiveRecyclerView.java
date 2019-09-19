@@ -1,13 +1,11 @@
 package sb.liverecyclerview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +13,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import java.util.List;
-
+@SuppressWarnings("unused")
 public class StatableLiveRecyclerView extends LiveRecyclerView {
 
     private final LayoutManager stateLayoutManager;
@@ -36,13 +33,34 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
         this(context, attrs, 0);
     }
 
-    public StatableLiveRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public StatableLiveRecyclerView(
+            @NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         stateLayoutManager = new LinearLayoutManager(context, VERTICAL, false);
 
         loadingView = LayoutInflater.from(context).inflate(R.layout.lrv_loading_view, this, false);
         errorView = new View(context);
         emptyView = new View(context);
+
+        TypedArray typedArray = getContext().getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.StatableLiveRecyclerView,
+                0,
+                0);
+        for (int i = 0; i < typedArray.length(); i++) {
+            int attr = typedArray.getIndex(i);
+
+            if (attr == R.styleable.StatableLiveRecyclerView_lrv_loading_view_visible) {
+                boolean isVisible = typedArray.getBoolean(attr, false);
+                loadingView.setVisibility(isVisible ? VISIBLE : GONE);
+            } else if (attr == R.styleable.StatableLiveRecyclerView_lrv_loading_view_layout) {
+                loadingView = initView(typedArray, attr, StatableLiveList.State.LOADING);
+            } else if (attr == R.styleable.StatableLiveRecyclerView_lrv_empty_view_layout) {
+                emptyView = initView(typedArray, attr, StatableLiveList.State.EMPTY);
+            } else if (attr == R.styleable.StatableLiveRecyclerView_lrv_error_view_layout) {
+                errorView = initView(typedArray, attr, StatableLiveList.State.ERROR);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -68,6 +86,11 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
                 }
             }
         });
+    }
+
+    @Override
+    public StatableLiveList getData() {
+        return (StatableLiveList) super.getData();
     }
 
     @Override
@@ -110,6 +133,17 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
 
     public View getEmptyView() {
         return emptyView;
+    }
+
+    private View initView(TypedArray typedArray, int attr, StatableLiveList.State state) {
+        int resId = typedArray.getResourceId(attr, 0);
+        View view = LayoutInflater.from(getContext()).inflate(resId, this, false);
+
+        if (getData() != null && getData().getState().getValue() == state) {
+            setStateAdapter(view);
+        }
+
+        return view;
     }
 
     private void setStateAdapter(View view) {

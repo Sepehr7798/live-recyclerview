@@ -10,6 +10,7 @@ import java.util.List;
 
 import sb.livecollection.LiveList;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class StatableLiveList<T> extends LiveList<T> {
 
     private static final String TAG = "StatableLiveList";
@@ -20,6 +21,7 @@ public class StatableLiveList<T> extends LiveList<T> {
         state = new MutableLiveData<>();
     }
 
+    @SafeVarargs
     public StatableLiveList(T... items) {
         super(items);
         this.state = new MutableLiveData<>();
