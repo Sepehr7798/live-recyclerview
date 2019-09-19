@@ -137,8 +137,9 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
 
     private View initView(TypedArray typedArray, int attr, StatableLiveList.State state) {
         int resId = typedArray.getResourceId(attr, 0);
-        View view = LayoutInflater.from(getContext()).inflate(resId, this, false);
+        if (resId == 0) return new View(getContext());
 
+        View view = LayoutInflater.from(getContext()).inflate(resId, this, false);
         if (getData() != null && getData().getState().getValue() == state) {
             setStateAdapter(view);
         }
