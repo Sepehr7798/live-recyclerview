@@ -44,7 +44,8 @@ public abstract class BindingItemLiveListAdapter<T>
         holder.bind(getItem(position));
     }
 
-    static class Holder<T> extends RecyclerView.ViewHolder {
+    @SuppressWarnings("WeakerAccess")
+    public static class Holder<T> extends RecyclerView.ViewHolder {
 
         private final ViewDataBinding binding;
 
