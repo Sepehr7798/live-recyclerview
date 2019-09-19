@@ -52,15 +52,21 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
                 R.styleable.StatableLiveRecyclerView_lrv_loading_view_visible, true);
         loadingView.setVisibility(isVisible ? VISIBLE : GONE);
 
-        loadingView = initView(typedArray,
+        View v;
+        v = initView(typedArray,
                 R.styleable.StatableLiveRecyclerView_lrv_loading_view_layout,
                 StatableLiveList.State.LOADING);
-        emptyView = initView(typedArray,
+        if (v != null) loadingView = v;
+
+        v = initView(typedArray,
                 R.styleable.StatableLiveRecyclerView_lrv_empty_view_layout,
                 StatableLiveList.State.EMPTY);
-        errorView = initView(typedArray,
+        if (v != null) emptyView = v;
+
+        v = initView(typedArray,
                 R.styleable.StatableLiveRecyclerView_lrv_error_view_layout,
                 StatableLiveList.State.ERROR);
+        if (v != null) errorView = v;
 
         typedArray.recycle();
     }
@@ -139,7 +145,7 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
 
     private View initView(TypedArray typedArray, int attr, StatableLiveList.State state) {
         int resId = typedArray.getResourceId(attr, 0);
-        if (resId == 0) return new View(getContext());
+        if (resId == 0) return null;
 
         View view = LayoutInflater.from(getContext()).inflate(resId, this, false);
         if (getData() != null && getData().getState().getValue() == state) {
