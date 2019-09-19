@@ -47,20 +47,22 @@ public class StatableLiveRecyclerView extends LiveRecyclerView {
                 R.styleable.StatableLiveRecyclerView,
                 0,
                 0);
-        for (int i = 0; i < typedArray.length(); i++) {
-            int attr = typedArray.getIndex(i);
 
-            if (attr == R.styleable.StatableLiveRecyclerView_lrv_loading_view_visible) {
-                boolean isVisible = typedArray.getBoolean(attr, false);
-                loadingView.setVisibility(isVisible ? VISIBLE : GONE);
-            } else if (attr == R.styleable.StatableLiveRecyclerView_lrv_loading_view_layout) {
-                loadingView = initView(typedArray, attr, StatableLiveList.State.LOADING);
-            } else if (attr == R.styleable.StatableLiveRecyclerView_lrv_empty_view_layout) {
-                emptyView = initView(typedArray, attr, StatableLiveList.State.EMPTY);
-            } else if (attr == R.styleable.StatableLiveRecyclerView_lrv_error_view_layout) {
-                errorView = initView(typedArray, attr, StatableLiveList.State.ERROR);
-            }
-        }
+        boolean isVisible = typedArray.getBoolean(
+                R.styleable.StatableLiveRecyclerView_lrv_loading_view_visible, true);
+        loadingView.setVisibility(isVisible ? VISIBLE : GONE);
+
+        loadingView = initView(typedArray,
+                R.styleable.StatableLiveRecyclerView_lrv_loading_view_layout,
+                StatableLiveList.State.LOADING);
+        emptyView = initView(typedArray,
+                R.styleable.StatableLiveRecyclerView_lrv_empty_view_layout,
+                StatableLiveList.State.EMPTY);
+        errorView = initView(typedArray,
+                R.styleable.StatableLiveRecyclerView_lrv_error_view_layout,
+                StatableLiveList.State.ERROR);
+
+        typedArray.recycle();
     }
 
     @SuppressWarnings("unchecked")
